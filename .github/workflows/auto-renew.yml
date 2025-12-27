@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: ⚔️ 勇者的冒险
         run: |
-          API_KEY="ptlc_hkOXaoHisJCcjqihBY1xbPrzmQNw05nvrqAaeeRMNIT"
+          API_KEY="ptlc_Chj4hnIYOeTiM4T15O6Zr80YFpXHbIuCvHXeFpjpEm5"
           
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "🏰 勇者斗恶龙 - 每日冒险开始！"
@@ -68,20 +68,20 @@ jobs:
           }
           
           # 续期 KRF3
-          renew_server "KRF3" "54fc7a5e-4081-4cca-b862-7e42965fe1b2" "notfreeservers"
-          KRF3_STATUS=$?
+          #renew_server "KRF3" "54fc7a5e-4081-4cca-b862-7e42965fe1b2" "notfreeservers"
+          #KRF3_STATUS=$?
           
           sleep 2
           
-          # 续期 KRF3
-          #renew_server "KRF3" "54fc7a5e-4081-4cca-b862-7e42965fe1b2" "freeservers"
+          # 续期 KRF6
+          renew_server "KRF6" "54fc7a5e-4081-4cca-b862-7e42965fe1b2" "freeservers"
           #KRF6_STATUS=$?
           
           echo ""
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           # 统计战果
-          if [ $KRF3_STATUS -eq 0 ] ; then
+          if [ $KRF6_STATUS -eq 0 ] ; then
             echo "🎉 今日冒险完成！所有恶龙都已被征服！"
             echo "🏆 勇者获得了经验值！等级提升！"
           elif [ $KRF3_STATUS -ne 0 ] ; then
@@ -91,7 +91,7 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           # 如果有任何一个失败，则退出码为1
-          if [ $KRF3_STATUS -ne 0 ] || [ $KRF6_STATUS -ne 0 ]; then
+          if [ $KRF6_STATUS -ne 0 ] ; then
             exit 1
           fi
 

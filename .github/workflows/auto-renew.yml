@@ -1,52 +1,101 @@
-name: Weirdhost Auto Renew
+name: WeirdHost Auto Renew - 勇者斗恶龙
 
 on:
   schedule:
-    - cron: '0 18 * * *'  # 每天 UTC 1:00 (北京时间 9:00) 运行
-  workflow_dispatch:     # 允许手动触发
+    # 每天北京时间上午 10:00 执行 (UTC 时间 02:00)
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # 允许手动触发测试
 
 jobs:
-  login-test:
+  renew:
     runs-on: ubuntu-latest
     
-    # 授予工作流写入仓库内容的权限
-    permissions:
-      contents: write
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install dependencies
-      run: |
-        pip install playwright
-        playwright install chromium
-        
-    - name: Run auto renewal
-      env:
-        REMEMBER_WEB_COOKIE: ${{ secrets.REMEMBER_WEB_COOKIE }}
-        WEIRDHOST_EMAIL: ${{ secrets.WEIRDHOST_EMAIL }}
-        WEIRDHOST_PASSWORD: ${{ secrets.WEIRDHOST_PASSWORD }}
-        WEIRDHOST_SERVER_URLS: ${{ secrets.WEIRDHOST_SERVER_URLS }}
-      run: python main.py
-      
-    - name: Commit README file
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        
-        # 添加README文件
-        git add README.md
-        
-        # 检查是否有变化需要提交
-        if git diff --cached --quiet; then
-          echo "README文件无变化，无需提交"
-        else
-          git commit -m "📝 更新运行状态: $(date +'%Y-%m-%d %H:%M:%S')"
-          git push origin HEAD:main
-        fi
+      - name: ⚔️ 勇者的冒险
+        run: |
+          API_KEY="ptlc_hkOXaoHisJCcjqihBY1xbPrzmQNw05nvrqAaeeRMNIT"
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🏰 勇者斗恶龙 - 每日冒险开始！"
+          echo "📅 $(TZ='Asia/Shanghai' date '+%Y年%m月%d日 %H:%M')"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 定义续期函数
+          renew_server() {
+            local SERVER_NAME=$1
+            local SERVER_ID=$2
+            local API_TYPE=$3
+            
+            echo ""
+            echo "🗡️  勇者向 ${SERVER_NAME} 城堡的恶龙发起挑战..."
+            
+            RENEW_URL="https://hub.weirdhost.xyz/api/client/${API_TYPE}/${SERVER_ID}/renew"
+            
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$RENEW_URL" \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer $API_KEY" \
+              -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36")
+            
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+            
+            case $HTTP_CODE in
+              200)
+                echo "⚔️  [$SERVER_NAME] ✨ 勇者成功击败恶龙！服务器续期成功！"
+                return 0
+                ;;
+              400)
+                echo "😴 [$SERVER_NAME] 💤 勇者今天睡懒觉了，恶龙已经被昨天打败过了~"
+                return 0
+                ;;
+              401)
+                echo "🔑 [$SERVER_NAME] ❌ 勇者的钥匙失效了！无法进入城堡！"
+                return 1
+                ;;
+              403)
+                echo "🚫 [$SERVER_NAME] ❌ 城堡大门紧闭！勇者被拒之门外！"
+                return 1
+                ;;
+              404)
+                echo "🗺️  [$SERVER_NAME] ❌ 勇者迷路了！找不到这座城堡！"
+                return 1
+                ;;
+              *)
+                echo "💥 [$SERVER_NAME] ❌ 恶龙太强了！勇者被揍飞了！"
+                return 1
+                ;;
+            esac
+          }
+          
+          # 续期 KRF3
+          renew_server "KRF3" "54fc7a5e-4081-4cca-b862-7e42965fe1b2" "notfreeservers"
+          KRF3_STATUS=$?
+          
+          sleep 2
+          
+          # 续期 KRF3
+          #renew_server "KRF3" "54fc7a5e-4081-4cca-b862-7e42965fe1b2" "freeservers"
+          #KRF6_STATUS=$?
+          
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 统计战果
+          if [ $KRF3_STATUS -eq 0 ] ; then
+            echo "🎉 今日冒险完成！所有恶龙都已被征服！"
+            echo "🏆 勇者获得了经验值！等级提升！"
+          elif [ $KRF3_STATUS -ne 0 ] ; then
+            echo "⚠️  今日冒险遇到挫折！勇者需要休整后再战！"
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 如果有任何一个失败，则退出码为1
+          if [ $KRF3_STATUS -ne 0 ] || [ $KRF6_STATUS -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: 📯 冒险失败通知
+        if: failure()
+        run: |
+          echo "🆘 勇者需要支援！请查看战斗日志！"
